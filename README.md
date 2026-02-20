@@ -28,3 +28,10 @@ The project relies on real-world data provided by FiveThirtyEight via Kaggle, su
 2.  **Supplementary/Derived Data**:
     * **Pricing Rules (Simulated)**: A custom table defining base rates ($/mile, $/minute) and surge multipliers derived from pickup density.
     * **NYC Zone Lookup**: Mapping latitude/longitude coordinates to specific NYC boroughs and neighborhoods for regional analysis.
+
+## Proposed Database Application & ER Design
+
+To support the analytics and pricing engine described above, the proposed database schema maps the operational flow of a ride-sharing fleet. The design focuses on geographic zones, fleet vehicles, and the trips that connect them, while also modeling dynamic surge pricing events over time.
+
+**Unique/Difficult Aspects:**
+The most complex aspect of this application is managing the temporal and spatial data simultaneously. Specifically, resolving the Many-to-Many (M:N) relationship between `Vehicles` and `Zones`. A vehicle visits many zones, and a zone hosts many vehicles. This is resolved by the `Trip` associative entity, which acts as a bridge recording the exact time and cost of a vehicle picking up a passenger in a specific zone. Additionally, modeling `Surge Period` as a weak entity dependent on `Zone` ensures that dynamic pricing multipliers are strictly bound to specific locations and times.
