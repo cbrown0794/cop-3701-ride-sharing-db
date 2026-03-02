@@ -1,47 +1,43 @@
-# Database Entity-Relationship (ER) Diagram
+# Database Relational Schema (Normalized)
 
-## User Groups
-1. **Fleet Managers:** Utilize the system to track `Vehicle` assignments and monitor `Telematics_Tracker` data for utilization.
-2. **Pricing Analysts:** Query the `Zone` and `Surge_Period` tables to adjust or simulate pricing algorithms.
-3. **Data Engineers / DBAs:** Maintain the ingestion pipeline feeding the massive `Trip` associative table.
+Below is the final, BCNF-compliant relational schema derived from the ER diagram, reflecting the physical tables, data types, and constraints that will be implemented in the database.
 
-## ER Diagram
 ```mermaid
 erDiagram
-    DISPATCH_BASE ||--|{ VEHICLE : "manages (1:N)"
-    VEHICLE ||--|| TELEMATICS_TRACKER : "monitors (1:1)"
-    ZONE ||--|{ SURGE_PERIOD : "experiences (1:N, Identifying)"
-    VEHICLE ||--|{ TRIP : "completes (1:N)"
-    ZONE ||--|{ TRIP : "originates at (1:N)"
+    DISPATCH_BASE ||--|{ VEHICLE : "manages"
+    VEHICLE ||--|| TELEMATICS_TRACKER : "monitors"
+    ZONE ||--|{ SURGE_PERIOD : "experiences"
+    VEHICLE ||--|{ TRIP : "completes"
+    ZONE ||--|{ TRIP : "originates at"
 
     DISPATCH_BASE {
-        string BaseCode PK "Identifier"
-        string BaseName "Mandatory"
+        VARCHAR(10) BaseCode PK
+        VARCHAR(50) BaseName
     }
     VEHICLE {
-        string VehicleID PK "Identifier"
-        string LicensePlate "Mandatory, Single-value"
-        string BaseCode FK 
+        VARCHAR(15) VehicleID PK
+        VARCHAR(10) LicensePlate UK
+        VARCHAR(10) BaseCode FK 
     }
     TELEMATICS_TRACKER {
-        string TrackerID PK "Identifier"
-        string FirmwareVersion "Optional"
-        string VehicleID FK "Unique"
+        VARCHAR(15) TrackerID PK
+        VARCHAR(20) FirmwareVersion
+        VARCHAR(15) VehicleID FK "UK"
     }
     ZONE {
-        int ZoneID PK "Identifier"
-        string Borough "Mandatory"
+        INT ZoneID PK
+        VARCHAR(50) Borough
     }
     SURGE_PERIOD {
-        datetime StartTime "Partial Key"
-        float SurgeMultiplier "Mandatory"
-        int ZoneID FK "Identifying"
+        INT ZoneID PK, FK
+        DATETIME StartTime PK
+        DECIMAL SurgeMultiplier
     }
     TRIP {
-        int TripID PK "Identifier"
-        datetime PickupTime "Mandatory"
-        datetime DropoffTime "Optional"
-        float FareAmount "Single-value"
-        string VehicleID FK 
-        int ZoneID FK 
+        INT TripID PK
+        DATETIME PickupTime
+        DATETIME DropoffTime
+        DECIMAL FareAmount
+        VARCHAR(15) VehicleID FK 
+        INT ZoneID FK 
     }
